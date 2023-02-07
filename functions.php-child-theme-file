@@ -1,0 +1,46 @@
+<?php
+/**
+** activation theme
+**/
+add_action( 'wp_enqueue_scripts', 'theme_enqueue_styles' );
+function theme_enqueue_styles() {
+ wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
+
+}
+
+add_action( 'wp_footer', 'ci_theme_footer_scripts' );
+
+function ci_theme_footer_scripts() {
+	if ( wp_style_is( 'wp-mediaelement', 'enqueued' ) ) {
+		wp_enqueue_style( 'my-theme-player', get_stylesheet_directory_uri() . '/css/my-theme-player.css', array(
+			'wp-mediaelement',
+		), '1.0' );
+	}
+}
+
+/**
+ * Add an HTML class to MediaElement.js container elements to aid styling.
+ *
+ * Extends the core _wpmejsSettings object to add a new feature via the
+ * MediaElement.js plugin API.
+ */
+add_action( 'wp_print_footer_scripts', 'mytheme_mejs_add_container_class' );
+
+function mytheme_mejs_add_container_class() {
+	if ( ! wp_script_is( 'mediaelement', 'done' ) ) {
+		return;
+	}
+	?>
+	<script>
+	(function() {
+		var settings = window._wpmejsSettings || {};
+		settings.features = settings.features || mejs.MepDefaults.features;
+		settings.features.push( 'exampleclass' );
+		MediaElementPlayer.prototype.buildexampleclass = function( player ) {
+			player.container.addClass( 'mytheme-mejs-container' );
+		};
+	})();
+	</script>
+	<?php
+}
+?>
